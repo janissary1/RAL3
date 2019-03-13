@@ -1,19 +1,5 @@
-/*
-#include <stdlib.h>
-#include <iostream>
-#include <random>
-#include <vector>
-#include <array>
-#include <time.h>
-*/
 #include "episode.h"
-/*
-bool left_of_wall(int x, int y);
-bool right_of_wall(int x, int y);
-bool below_wall(int x, int y);
-bool above_wall(int x, int y);
-int select_action(double* policy);
-*/
+
 //A = {up,right,down,left}
 std::vector< std::array<int,4> > generateEpisode(double* policy,char** board){
     std::random_device rd;
