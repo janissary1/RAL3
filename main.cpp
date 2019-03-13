@@ -17,7 +17,7 @@ double*** initpolicy(){
 
 }
 int main(int argc, char** args){
-    double policy[4] = {0.25,0.25,0.25,0.25};
+    double*** policy = initpolicy();
     std::array<std::array<char,10>,10> board = build_board();
     std::vector< std::array<int,4> > out = generateEpisode(policy,1.0,0.0);
     
