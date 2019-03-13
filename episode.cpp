@@ -1,19 +1,21 @@
+/*
 #include <stdlib.h>
 #include <iostream>
 #include <random>
 #include <vector>
 #include <array>
 #include <time.h>
-
-
+*/
+#include "episode.h"
+/*
 bool left_of_wall(int x, int y);
 bool right_of_wall(int x, int y);
 bool below_wall(int x, int y);
 bool above_wall(int x, int y);
 int select_action(double* policy);
-
+*/
 //A = {up,right,down,left}
-std::vector< std::array<int,4> > generateEpisode(double* policy,int** board){
+std::vector< std::array<int,4> > generateEpisode(double* policy,char** board){
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_int_distribution<int> dist(0, 9);
@@ -237,10 +239,25 @@ std::vector< std::array<int,4> > generateEpisode(double* policy,int** board){
             episode.push_back(next);
             A = select_action(policy);
             std::printf("[%d,%d]:%d\n",x,y,A);
-            board[x][y] = 1;
+            
+            char c ;
+            if (A == 0){
+                c = '^';
+            }
+            else if (A == 1){
+                c = '>';
+            }
+            else if (A == 2){
+                c = 'v';
+            }
+            else if (A==3){
+                c = '<';
+            }
+            board[x][y] = c;
+            //board[x][y] = 1;
             }
             std::printf("[%d,%d]:%d\n",x,y,A);
-            board[x][y] = 1;
+            board[x][y] = 'T';
 
             return episode;
         }
@@ -265,14 +282,14 @@ int select_action(double* policy){
     }
 }
 
-int** build_board(){
-    int** board = new int*[10];
+char** build_board(){
+    char** board = new char*[10];
     for (int i = 0; i < 10; i++){
-        board[i] = new int[10];
+        board[i] = new char[10];
     } 
     for (int i = 0; i < 10; i++){
         for(int k = 0 ; k < 10; k++){
-            board[k][i] = 0;
+            board[k][i] = ' ';
         }
     }
     return board;
@@ -297,20 +314,4 @@ bool below_wall(int x, int y){
     if (y == 0){return true;}
     if (y == 5 && x != 2 && x != 7){return true;}
     return false;
-}
-
-
-int main(int argc, char** args){
-    double policy[4] = {0.25,0.25,0.25,0.25};
-    int** board = build_board();
-    generateEpisode(policy,board);
-    
-    for(int i = 0; i < 10; i++){
-        for(int k = 0; k < 10; k++){
-            std::cout << board[k][i];
-        }
-        std::cout << "\n";
-    }
-   
-    return 0;
 }
