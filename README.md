@@ -1,6 +1,5 @@
 Reinforcement Learning Assignment
 
-
 ---First Visit MC Prediction---
 Policy: pi
 
