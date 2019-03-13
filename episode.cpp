@@ -1,7 +1,7 @@
 #include "episode.h"
 
 //A = {up,right,down,left}
-std::vector< std::array<int,4> > generateEpisode(double* policy,long p1, long p2){
+std::vector< std::array<int,4> > generateEpisode(double* policy,double p1, double p2){
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_int_distribution<int> dist(0, 9);
@@ -18,7 +18,7 @@ std::vector< std::array<int,4> > generateEpisode(double* policy,long p1, long p2
         while (true) {
             std::array<int, 2>  next_state = take_action(x,y,A,p1,p2);
             std::array<int, 4> next = {x,y,A,-1};
-            if (x == 9 && y == 0){next[3] = 100;break;}
+            if (x == 9 && y == 0){next[3] = 100;episode.push_back(next);break;}
             episode.push_back(next);
             A = select_action(policy);
             x = next_state[0];
@@ -82,7 +82,7 @@ bool below_wall(int x, int y){
 }
 
 
-std::array<int, 2> take_action(int x, int y, int action,long p1, long p2){
+std::array<int, 2> take_action(int x, int y, int action,double p1,double p2){
    // std::cout << x << " " << y << " " << action << "\n" ;
     int next_state;
     std::array<int, 2>  out;
