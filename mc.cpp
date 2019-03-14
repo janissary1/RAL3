@@ -38,8 +38,10 @@ int main(int argc, char** argv) {
     double*** policy = initpolicy();
     //init a arbitrary policy with e-soft policy
     
+    //int Q
+    std::array<std::array<std::array<double, 4>, 10>, 10> Q = {};
     //init returns
-    std::array<std::array<double, 4>, 10> returns = {};
+    std::array<std::array<std::array<double, 4>, 10>, 10> returns = {};
     //generate episode
     std::vector< std::array<int,4> > episode = generateEpisode(policy,prob1,prob2);
     
