@@ -3,100 +3,76 @@
     Daniel Bellissimo 500749419
     CPS841 Assignment 3 Question 2 SARSA Implementation
 */
-#include <iostream>
-#include <vector>
-#include <cstdlib>
-#include <ctime>
-#include <cmath>
-#include <iostream>
-#include <fstream>
-#include <chrono>
-#include <algorithm>
-#include <numeric>
-#include <array>
-#include <random>
+#include "sarsa.h"
+#include "episode.h"
 
-int select_action(double* policy){
-    std::random_device rd;
-    std::mt19937 mt(rd());
-    std::uniform_real_distribution<double> dist(0.0, 1.0);
-    double rando = dist(mt);
-    double upper_bound = 0.0;
-    double lower_bound = 0.0;
-    for (int i = 0; i < 4; i++){
-        upper_bound += policy[i];
-        if (lower_bound < rando && rando <= upper_bound){
-            return i;
-        }
-        lower_bound += policy[i];
-    }
-}
-std::array< std::array<std::array<double, 4>, 10>, 10> initq(){
-    std::array< std::array<std::array<double, 4>, 10>, 10> Q;
-    return Q;
-}
 
-std::array< std::array<std::array<double, 4>, 10>, 10> sarsa(std::array< std::array<std::array<double, 4>, 10>, 10> policy,std::array< std::array<std::array<double, 4>, 10>, 10> q,float p1, float p2,char** board, double alpha, double gamma,double epsilon){
+void sarsa(double*** policy, double*** q,double p1, double p2, double alpha, double gamma,double epsilon){
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_int_distribution<int> dist(0, 9);
     
-    int x = dist(mt);
-    int y = dist(mt);
-    int A = epsilon_greedy(policy[y][x],epsilon);
-    board[y][x] = 8;
+    int x1 = dist(mt);
+    int y1 = dist(mt);
+    int A = epsilon_greedy(policy[y1][x1],epsilon);
     
-    if (x != 9 && y != 0){
-        //printf("[%d,%d]:%d\n",x,y,A);
+    if (x1 != 9 && y1 != 0){
+            while (true) {
+                int x2,y2,a2;
+                
 
-        while (true) {
-            double transitionP[4] = {0,0,0,0};
-            int next_state;
-            int x1 = x;
-            int y1 = y;
-            int a1 = A;
-            int R = -1;
-            int x2,y2,a2;
-
-            if (x == 9 && y == 0){R=100;}
-            x2 = x;
-            y2 = y;
-            a2 = epsilon_greedy(q[y1][x1],epsilon);
-            q[y1][x1][a1] = q[y1][x1][a1] + alpha*(R + gamma*q[y2][x2][a2] - q[y1][x1][a1]);
-            if (x == 9 && y == 0){break;}
-
-            
-            //std::printf("[%d,%d]:%d\n",x,y,A);
-            /*
-            char c ;
-            if (A == 0){c = '^';}
-            else if (A == 1){c = '>';}
-            else if (A == 2){c = 'v';}
-            else if (A==3){c = '<';}
-            board[y][x] = c;*/
+                int a1 = A;
+                int R = -1;
+                std::array<int, 2> next_state = take_action(x1,y1,a1,p1,p2);
+                a2 = epsilon_greedy(q[y1][x1],epsilon);//
+    
+                
+                x2 = next_state[0];
+                y2 = next_state[1];
+                if (x2 == 9 && y2 == 0){
+                    R=100;
+                    q[y1][x1][a1] = q[y1][x1][a1] + alpha*(R + gamma*q[y2][x2][a2] - q[y1][x1][a1]);
+                    break;
+                    }
+                else {
+                    q[y1][x1][a1] = q[y1][x1][a1] + alpha*(R + gamma*q[y2][x2][a2] - q[y1][x1][a1]);
+                }
+                
+                x1 = x2;
+                y1 = y2;
+                A = a2;
+                
             }
         }
     else{
-        return sarsa(policy,q,p1,p2,board,alpha,gamma,epsilon);
-    }
+        return sarsa(policy,q,p1,p2,alpha,gamma,epsilon);
+        }
+    
 }
 
-int epsilon_greedy(std::array<double, 4> policy,float epsilon){
+int epsilon_greedy(double* policy,double epsilon){
+    
+    
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_real_distribution<double> dist(0.0, 1.0);
     double rando = dist(mt);
-    if (rando <= 0.3){
+    if (rando <= epsilon){
         std::random_device rd2;
         std::mt19937 mt2(rd2());
         std::uniform_int_distribution<int> dist(0,3);
         int rando = dist(mt2);
         return rando;
         }
-    else{return std::distance(policy,std::max_element(policy.begin(),policy.end()));}
+    else{return maxIndex(policy,4);}
 }
-/*
-int maxIndex(std::array<double, 4> arr){
 
+int maxIndex(double* arr, int len){
+    double max = *std::max_element(arr,arr+len);
+    for(int i = 0; i < len; i++){
+        if (arr[i] == max){
+            return i;
+        }
+
+    }
 }
-*/

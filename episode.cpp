@@ -87,6 +87,8 @@ std::array<int, 2> take_action(int x, int y, int action,double p1,double p2){
     int next_state;
     std::array<int, 2>  out;
     double transitionP[4] = {0,0,0,0};
+
+                
     if (action == 0){ //up
         if (below_wall(x,y)){
             transitionP[0] = (1.0-p1-p2)/2.0; //left adj
@@ -286,6 +288,7 @@ std::array<int, 2> take_action(int x, int y, int action,double p1,double p2){
                 else if (next_state == 3){y+=1;x-=1;}
             }
     }
+
     out[0] = x;
     out[1] = y;
     return out;

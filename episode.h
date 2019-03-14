@@ -5,6 +5,7 @@
 #include <array>
 #include <time.h>
 
+
 std::vector< std::array<int,4> > generateEpisode(double*** policy,double p1, double p2);
 int select_action(double* policy);
 std::array<std::array<char,10>,10> build_board();
