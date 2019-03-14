@@ -15,7 +15,7 @@
 #include <algorithm>
 #include <numeric>
 double average(std::array<double, 4> actions);
-bool in_episode(int state_x, int state_y, std::vector< std::array<int,4> > episode);
+bool last_in_episode(int state_x, int state_y, std::vector< std::array<int,4> > episode);
 int argmax(std::array<double, 4> a);
 double reward(int state_x, int state_y, int action);
 double*** initpolicy();
@@ -54,8 +54,7 @@ int main(int argc, char** argv) {
             }
         }
     }
-
-    //int Q
+    //init Q
     std::array<std::array<std::array<double, 4>, 10>, 10> Q = {};
     //init returns
     std::array<std::array<std::vector<double>, 10>, 10> returns = {};
@@ -65,7 +64,7 @@ int main(int argc, char** argv) {
         G = 0.0;
         for (int t = episode.size() - 1; t >= 0; t--) {
             G = gamma_mine * G + episode[t + 1][3];
-            if ( !(in_episode(episode[t][0], episode[t][1], episode)) ) {
+            if (last_in_episode(episode[t][0], episode[t][1], episode)) {
                 returns[episode[t][0]][episode[t][0]].push_back(G);
                 Q[episode[t][0]][episode[t][0]][episode[t][2]] = average(returns[episode[t][0]][episode[t][1]]);
                 int best_action = argmax(Q[episode[t][0]][episode[t][0]]);
@@ -105,9 +104,19 @@ double average(std::vector<double> actions) {
     }
     return sum / actions.size();
 }
-bool in_episode(int state_x, int state_y, std::vector< std::array<int,4> > episode) {
+bool last_in_episode(int state_x, int state_y, std::vector< std::array<int,4> > episode) {
+    int last_index = 0;
     for (int i = 0; i < episode.size(); i++) {
-        
+        if (state_x == episode[i][0]) {
+            if (state_y == episode[i][1]) {
+                last_index = i;
+            }
+        }
+    }
+    if (state_x == episode[last_index][0]) {
+        if (state_y == episode[last_index][1]) {
+            return true;
+        }
     }
     return false;
 }
