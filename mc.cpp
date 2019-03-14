@@ -14,8 +14,8 @@
 #include <chrono>
 #include <algorithm>
 #include <numeric>
-double average(std::array<double, 4> actions);
-bool last_in_episode(int state_x, int state_y, std::vector< std::array<int,4> > episode);
+double average(std::vector<double> actions);
+bool last_in_episode(int state_x, int state_y, std::vector< std::array<int,4> > episode, int time_step);
 int argmax(std::array<double, 4> a);
 double reward(int state_x, int state_y, int action);
 double*** initpolicy();
@@ -59,15 +59,15 @@ int main(int argc, char** argv) {
     //init returns
     std::array<std::array<std::vector<double>, 10>, 10> returns = {};
     //episodic learning
-    for (int count = 0; count < 10; count++) {
+    for (int count = 0; count < 1; count++) {
         std::vector< std::array<int,4> > episode = generateEpisode(policy,prob1,prob2);
         G = 0.0;
         for (int t = episode.size() - 1; t >= 0; t--) {
             G = gamma_mine * G + episode[t + 1][3];
-            if (last_in_episode(episode[t][0], episode[t][1], episode)) {
-                returns[episode[t][0]][episode[t][0]].push_back(G);
-                Q[episode[t][0]][episode[t][0]][episode[t][2]] = average(returns[episode[t][0]][episode[t][1]]);
-                int best_action = argmax(Q[episode[t][0]][episode[t][0]]);
+            if (last_in_episode(episode[t][0], episode[t][1], episode, t)) {
+                returns[episode[t][0]][episode[t][1]].push_back(G);
+                Q[episode[t][0]][episode[t][1]][episode[t][2]] = average(returns[episode[t][0]][episode[t][1]]);
+                int best_action = argmax(Q[episode[t][0]][episode[t][1]]);
                 for (int a = 0; a < 4; a++) {
                     if (best_action == a) {
                         policy[episode[t][0]][episode[t][1]][a] = (1 - epsilon + (epsilon / 4));
@@ -104,7 +104,7 @@ double average(std::vector<double> actions) {
     }
     return sum / actions.size();
 }
-bool last_in_episode(int state_x, int state_y, std::vector< std::array<int,4> > episode) {
+bool last_in_episode(int state_x, int state_y, std::vector< std::array<int,4> > episode, int time_step) {
     int last_index = 0;
     for (int i = 0; i < episode.size(); i++) {
         if (state_x == episode[i][0]) {
@@ -113,12 +113,11 @@ bool last_in_episode(int state_x, int state_y, std::vector< std::array<int,4> > 
             }
         }
     }
-    if (state_x == episode[last_index][0]) {
-        if (state_y == episode[last_index][1]) {
-            return true;
-        }
+    if (last_index == time_step) {
+        return true;
+    } else {
+        return false;
     }
-    return false;
 }
 
 int argmax(std::array<double, 4> a) {
