@@ -14,7 +14,10 @@
 #include <chrono>
 #include <algorithm>
 #include <numeric>
-
+double average(std::array<double, 4> actions);
+bool in_episode(int state_x, int state_y, std::vector< std::array<int,4> > episode);
+int argmax(std::array<double, 4> a);
+double reward(int state_x, int state_y, int action);
 double*** initpolicy();
 //prints cpu time
 void printRun(std::chrono::duration<double> run_time) {
@@ -22,6 +25,8 @@ void printRun(std::chrono::duration<double> run_time) {
 }
 double prob1, prob2;
 double epsilon = 0.1;
+double G = 0.0;
+double gamma_mine = 0.9;
 const int UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;
 
 int main(int argc, char** argv) {
@@ -36,24 +41,87 @@ int main(int argc, char** argv) {
     // ----------------- monte carlo learning ----------------- //
     //init policy
     double*** policy = initpolicy();
-    //init a arbitrary policy with e-soft policy
-    
+    //init a arbitrary policy with e-soft policy TODO
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            int best = rand() % 4;
+            for (int a = 0; a < 4; a++) {
+                if (best == a) {
+                    policy[i][j][a] = (1 - epsilon + (epsilon / 4));
+                } else {
+                    policy[i][j][a] = (epsilon / 4);
+                }
+            }
+        }
+    }
+
     //int Q
     std::array<std::array<std::array<double, 4>, 10>, 10> Q = {};
     //init returns
-    std::array<std::array<std::array<double, 4>, 10>, 10> returns = {};
-    //generate episode
-    std::vector< std::array<int,4> > episode = generateEpisode(policy,prob1,prob2);
-    
-
-
+    std::array<std::array<std::vector<double>, 10>, 10> returns = {};
+    //episodic learning
+    for (int count = 0; count < 10; count++) {
+        std::vector< std::array<int,4> > episode = generateEpisode(policy,prob1,prob2);
+        G = 0.0;
+        for (int t = episode.size() - 1; t >= 0; t--) {
+            G = gamma_mine * G + episode[t + 1][3];
+            if ( !(in_episode(episode[t][0], episode[t][1], episode)) ) {
+                returns[episode[t][0]][episode[t][0]].push_back(G);
+                Q[episode[t][0]][episode[t][0]][episode[t][2]] = average(returns[episode[t][0]][episode[t][1]]);
+                int best_action = argmax(Q[episode[t][0]][episode[t][0]]);
+                for (int a = 0; a < 4; a++) {
+                    if (best_action == a) {
+                        policy[episode[t][0]][episode[t][1]][a] = (1 - epsilon + (epsilon / 4));
+                    } else {
+                        policy[episode[t][0]][episode[t][1]][a] = (epsilon / 4);
+                    }
+                }
+            }
+        }
+    }
     // ----------------- monte carlo learning ----------------- //
     auto end = std::chrono::system_clock::now(); // end time
     std::chrono::duration<double> elapsed_seconds = end-start;
     std::cout << "Total ";
     printRun(elapsed_seconds);
-   
+
+    std::cout << "Optimal Policy: " << std::endl;
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            for (int k = 0; k < 4; k ++) {
+                std::cout << Q[i][j][k] << " ";
+            }
+            std::cout << std::endl;
+        }
+    }
     return 0;
+}
+
+double average(std::vector<double> actions) {
+    double sum = 0;
+    for (int i = 0; i < actions.size(); i++)
+    {
+        sum += actions[i];
+    }
+    return sum / actions.size();
+}
+bool in_episode(int state_x, int state_y, std::vector< std::array<int,4> > episode) {
+    for (int i = 0; i < episode.size(); i++) {
+        
+    }
+    return false;
+}
+
+int argmax(std::array<double, 4> a) {
+    int max = a[0];
+    int index = 0;
+    for (int i = 1; i < a.size(); i++) {
+        if (max < a[i]) {
+            max = a[i];
+            index = i;
+        }
+    }
+    return index;
 }
 
 double*** initpolicy(){
