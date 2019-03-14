@@ -14,14 +14,17 @@
 #include <chrono>
 #include <algorithm>
 #include <numeric>
+
+double*** initpolicy();
 //prints cpu time
 void printRun(std::chrono::duration<double> run_time) {
     std::cout << "Computation Time: " << run_time.count() << "s" << std::endl;
 }
 double prob1, prob2;
+double epsilon = 0.1;
+const int UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;
 
 int main(int argc, char** argv) {
-    
     srand(time(NULL));
     if ( argc > 1 ) {
         prob1 = atof(argv[1]);
@@ -31,15 +34,17 @@ int main(int argc, char** argv) {
     }
     auto start = std::chrono::system_clock::now(); // start time
     // ----------------- monte carlo learning ----------------- //
-    double policy[4] = {0.25,0.25,0.25,0.25};
-    char** board = build_board();
-    std::vector<std::array<int,4>> episode = generateEpisode(policy,board);
-    for(int i = 0; i < 10; i++) {
-        for(int k = 0; k < 10; k++) {
-            printf("%2.c", board[k][i]);
-        }
-        std::cout << "\n";
-    }
+    //init policy
+    double*** policy = initpolicy();
+    //init a arbitrary policy with e-soft policy
+    
+    //init returns
+    std::array<std::array<double, 4>, 10> returns = {};
+    //generate episode
+    std::vector< std::array<int,4> > episode = generateEpisode(policy,prob1,prob2);
+    
+
+
     // ----------------- monte carlo learning ----------------- //
     auto end = std::chrono::system_clock::now(); // end time
     std::chrono::duration<double> elapsed_seconds = end-start;
@@ -47,4 +52,21 @@ int main(int argc, char** argv) {
     printRun(elapsed_seconds);
    
     return 0;
+}
+
+double*** initpolicy(){
+    double*** policy;
+      
+    policy = new double**[10];
+    for(int x = 0; x < 10; ++x) {
+        policy[x] = new double*[10];
+        for(int y = 0; y < 10; ++y) {
+            policy[x][y] = new double[4];
+            for(int z = 0; z < 4; ++z) { // initialize the values to whatever you want the default to be
+                policy[x][y][z] = 0.25;
+            }
+        }
+    }
+    return policy;
+
 }

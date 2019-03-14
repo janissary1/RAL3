@@ -16,4 +16,4 @@ run:
 	$(CC) -c $(CLASS) $(CFLAGS)
 	$(CC) -c $(CLASS2) $(CFLAGS)
 	$(CC) $(OBJ) $(OBJ2) -o $(OBJECT) $(CFLAGS)
-	./$(OBJECT)
+	./$(OBJECT) $(PARAMS)
