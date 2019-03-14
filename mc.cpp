@@ -5,6 +5,7 @@
 */
 #include "episode.h"
 #include <iostream>
+#include <ofstream>
 #include <vector>
 #include <cstdlib>
 #include <ctime>
@@ -14,6 +15,8 @@
 #include <chrono>
 #include <algorithm>
 #include <numeric>
+ofstream myfile("mc.txt");
+void printPolicy(double*** policy);
 double average(std::vector<double> actions);
 bool last_in_episode(int state_x, int state_y, std::vector< std::array<int,4> > episode, int time_step);
 int argmax(std::array<double, 4> a);
@@ -23,6 +26,7 @@ double*** initpolicy();
 void printRun(std::chrono::duration<double> run_time) {
     std::cout << "Computation Time: " << run_time.count() << "s" << std::endl;
 }
+double overall_timesteps = 0;
 double prob1, prob2;
 double epsilon = 0.1;
 double G = 0.0;
@@ -59,10 +63,12 @@ int main(int argc, char** argv) {
     //init returns
     std::array<std::array<std::vector<double>, 10>, 10> returns = {};
     //episodic learning
-    for (int count = 0; count < 1; count++) {
+    int count;
+    for (count = 0; count < 100; count++) {
         std::vector< std::array<int,4> > episode = generateEpisode(policy,prob1,prob2);
         G = 0.0;
         for (int t = episode.size() - 1; t >= 0; t--) {
+            overall_timesteps++;
             G = gamma_mine * G + episode[t + 1][3];
             if (last_in_episode(episode[t][0], episode[t][1], episode, t)) {
                 returns[episode[t][0]][episode[t][1]].push_back(G);
@@ -83,16 +89,11 @@ int main(int argc, char** argv) {
     std::chrono::duration<double> elapsed_seconds = end-start;
     std::cout << "Total ";
     printRun(elapsed_seconds);
-
+    std::cout << "Total timesteps: " << overall_timesteps << std::endl;
+    std::cout << "Total Episodes: " << count << std::endl;
     std::cout << "Optimal Policy: " << std::endl;
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
-            for (int k = 0; k < 4; k ++) {
-                std::cout << Q[i][j][k] << " ";
-            }
-            std::cout << std::endl;
-        }
-    }
+    printPolicy(policy);
+    myfile.close();
     return 0;
 }
 
@@ -104,12 +105,14 @@ double average(std::vector<double> actions) {
     }
     return sum / actions.size();
 }
+
 bool last_in_episode(int state_x, int state_y, std::vector< std::array<int,4> > episode, int time_step) {
     int last_index = 0;
-    for (int i = 0; i < episode.size(); i++) {
+    for (int i = episode.size(); i >= 0; i--) {
         if (state_x == episode[i][0]) {
             if (state_y == episode[i][1]) {
                 last_index = i;
+                break;
             }
         }
     }
@@ -131,7 +134,37 @@ int argmax(std::array<double, 4> a) {
     }
     return index;
 }
+int maxIndex(double* arr, int len){
+    double max = *std::max_element(arr,arr+len);
+    for(int i = 0; i < len; i++){
+        if (arr[i] == max){
+            return i;
+        }
 
+    }
+}
+void printPolicy(double*** policy){
+    for(int i = 0; i < 10; i++){
+        for(int k = 0; k < 10; k++){
+            int j = maxIndex(policy[i][k],4);
+            if( j == 0){
+                std::cout << "^" << " ";
+            }
+            else if( j== 1){
+                std::cout << ">" << " ";
+
+            }
+            else if (j == 2){
+                std::cout << "v" << " ";
+
+            }
+            else if (j == 3){
+                std::cout << "<" << " ";
+            }
+        }
+        std::cout << "\n";
+    }
+}
 double*** initpolicy(){
     double*** policy;
       

@@ -2,6 +2,7 @@
 
 //A = {up,right,down,left}
 std::vector< std::array<int,4> > generateEpisode(double*** policy,double p1, double p2){
+    
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_int_distribution<int> dist(0, 9);
@@ -13,9 +14,9 @@ std::vector< std::array<int,4> > generateEpisode(double*** policy,double p1, dou
     if (x != 9 && y != 0){
         std::vector< std::array<int,4> > episode;
         std::array<int, 4> first = {x,y,A,-1};
-    
+        int count = 0;
         episode.push_back(first);
-        while (true) {
+        while (++count < 1000) {
             std::array<int, 2>  next_state = take_action(x,y,A,p1,p2);
             std::array<int, 4> next = {x,y,A,-1};
             if (x == 9 && y == 0){next[3] = 100;episode.push_back(next);break;}
@@ -23,7 +24,6 @@ std::vector< std::array<int,4> > generateEpisode(double*** policy,double p1, dou
             A = select_action(policy[y][x]);
             x = next_state[0];
             y = next_state[1];
-           
         }
         return episode;
     }
