@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
     std::array<std::array<std::vector<double>, 10>, 10> returns = {};
     //episodic learning
     int count;
-    for (count = 0; count < 500000; count++) {
+    for (count = 0; count < 1000; count++) {
         std::vector< std::array<int,4> > episode = generateEpisode(policy,prob1,prob2);
         G = 0.0;
         //myfile << count << " " << episode.size() << std::endl;
