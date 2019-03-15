@@ -13,9 +13,9 @@ void qlearn(double*** policy, double*** q,double p1, double p2, double alpha, do
     
     int x1 = dist(mt);
     int y1 = dist(mt);
-
+    int t = 0;
     if (x1 != 9 && y1 != 0){
-            while (true) {
+            while (t < 200) {
                 int x2,y2,a2;
                 int a1 = epsilon_greedy(q[y1][x1],epsilon);
 
@@ -37,6 +37,7 @@ void qlearn(double*** policy, double*** q,double p1, double p2, double alpha, do
                 
                 x1 = x2;
                 y1 = y2;
+                t++;
             }
         }
     else{
