@@ -5,7 +5,7 @@ CLASS =episode.cpp
 CLASS2 =mc.cpp
 OBJ =episode.o
 OBJ2 =mc.o
-PARAMS=0.7 0.3
+PARAMS=1.0 0.0
 OBJECT=mc
 
 all: 

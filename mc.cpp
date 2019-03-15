@@ -5,7 +5,7 @@
 */
 #include "episode.h"
 #include <iostream>
-#include <ofstream>
+#include <fstream>
 #include <vector>
 #include <cstdlib>
 #include <ctime>
@@ -15,7 +15,6 @@
 #include <chrono>
 #include <algorithm>
 #include <numeric>
-ofstream myfile("mc.txt");
 void printPolicy(double*** policy);
 double average(std::vector<double> actions);
 bool last_in_episode(int state_x, int state_y, std::vector< std::array<int,4> > episode, int time_step);
@@ -64,9 +63,10 @@ int main(int argc, char** argv) {
     std::array<std::array<std::vector<double>, 10>, 10> returns = {};
     //episodic learning
     int count;
-    for (count = 0; count < 100; count++) {
+    for (count = 0; count < 500000; count++) {
         std::vector< std::array<int,4> > episode = generateEpisode(policy,prob1,prob2);
         G = 0.0;
+        //myfile << count << " " << episode.size() << std::endl;
         for (int t = episode.size() - 1; t >= 0; t--) {
             overall_timesteps++;
             G = gamma_mine * G + episode[t + 1][3];
@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
     std::cout << "Total Episodes: " << count << std::endl;
     std::cout << "Optimal Policy: " << std::endl;
     printPolicy(policy);
-    myfile.close();
+    //myfile.close();
     return 0;
 }
 
