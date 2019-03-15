@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
@@ -7,6 +8,7 @@
 #include <chrono>
 #include <algorithm>
 #include <numeric>
+#include <array>
 #include <random>
 #include <iterator>
 
